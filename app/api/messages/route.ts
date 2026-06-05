@@ -39,14 +39,14 @@ export async function GET(req: NextRequest) {
     WHERE senderId = ${userId} OR receiverId = ${userId}
   ` as { partnerId: string }[];
 
-  const partnerIds = convos.map((c) => c.partnerId);
+  const partnerIds = convos.map((c: any) => c.partnerId);
   const partners = await prisma.user.findMany({
     where: { id: { in: partnerIds } },
     select: { id: true, name: true, image: true, role: true },
   });
 
   const conversations = await Promise.all(
-    partners.map(async (p) => {
+    partners.map(async (p: any) => {
       const last = await prisma.message.findFirst({
         where: {
           OR: [{ senderId: userId, receiverId: p.id }, { senderId: p.id, receiverId: userId }],
