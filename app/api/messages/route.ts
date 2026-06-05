@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
     })
   );
 
-  return NextResponse.json(conversations.sort((a, b) =>
+  return NextResponse.json(conversations.sort((a: any, b: any) =>
     new Date(b.lastMessage?.createdAt ?? 0).getTime() - new Date(a.lastMessage?.createdAt ?? 0).getTime()
   ));
 }
