@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  name            String?
+  password        String?
+  image           String?
+  bio             String?
+  location        String?
+  province        String?
+  district        String?
+  phone           String?
+  role            String   @default("CLIENT")
+  rating          Float    @default(0)
+  reviewCount     Int      @default(0)
+  jobsCompleted   Int      @default(0)
+  successRate     Float    @default(0)
+  avgResponseTime Int?
+  verified        Boolean  @default(false)
+  phoneVerified   Boolean  @default(false)
+  emailVerified   Boolean  @default(false)
+  isBlocked       Boolean  @default(false)
+  skills          String   @default("[]")
+  specialties     String   @default("[]")
+  yearsExperience Int?
+  portfolio       String   @default("[]")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tasks            Task[]         @relation("ClientTasks")
+  bids             Bid[]
+  sentMessages     Message[]      @relation("SentMessages")
+  receivedMessages Message[]      @relation("ReceivedMessages")
+  givenReviews     Review[]       @relation("GivenReviews")
+  receivedReviews  Review[]       @relation("ReceivedReviews")
+  notifications    Notification[]
+  payments         Payment[]
+  accounts         Account[]
+  sessions         Session[]
+  reportsReceived  Report[]       @relation("ReportedUser")
+  reportsMade      Report[]       @relation("ReporterUser")
+  blockedUsers     UserBlock[]    @relation("BlockerUser")
+  blockedByUsers   UserBlock[]    @relation("BlockedUser")
+}
+
+model Task {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  category      String
+  location      String
+  province      String?
+  district      String?
+  budget        Float
+  deadline      DateTime?
+  photos        String    @default("[]")
+  status        String    @default("OPEN")
+  urgent        Boolean   @default(false)
+  isDraft       Boolean   @default(false)
+  viewCount     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  clientId      String
+  client        User      @relation("ClientTasks", fields: [clientId], references: [id])
+  acceptedBidId String?   @unique
+
+  bids          Bid[]
+  acceptedBid   Bid?      @relation("AcceptedBid", fields: [acceptedBidId], references: [id])
+  reviews       Review[]
+  payment       Payment?
+}
+
+model Bid {
+  id                String   @id @default(cuid())
+  amount            Float
+  message           String
+  estimatedDuration String
+  status            String   @default("PENDING")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  taskId   String
+  task     Task   @relation(fields: [taskId], references: [id])
+  workerId String
+  worker   User   @relation(fields: [workerId], references: [id])
+
+  acceptedTask Task? @relation("AcceptedBid")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  images    String   @default("[]")
+  read      Boolean  @default(false)
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  senderId   String
+  sender     User   @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User   @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  taskId     String?
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String
+  type      String   @default("CLIENT_TO_WORKER")
+  createdAt DateTime @default(now())
+
+  reviewerId String
+  reviewer   User   @relation("GivenReviews", fields: [reviewerId], references: [id])
+  revieweeId String
+  reviewee   User   @relation("ReceivedReviews", fields: [revieweeId], references: [id])
+  taskId     String
+  task       Task   @relation(fields: [taskId], references: [id])
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  amount          Float
+  serviceFee      Float
+  workerPayout    Float
+  status          String   @default("PENDING")
+  stripePaymentId String?
+  stripeEscrowId  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  taskId   String @unique
+  task     Task   @relation(fields: [taskId], references: [id])
+  clientId String
+  client   User   @relation(fields: [clientId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  data      String   @default("{}")
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  reason     String
+  details    String?
+  status     String   @default("PENDING")
+  createdAt  DateTime @default(now())
+
+  reporterId String
+  reporter   User   @relation("ReporterUser", fields: [reporterId], references: [id])
+  reportedId String
+  reported   User   @relation("ReportedUser", fields: [reportedId], references: [id])
+}
+
+model UserBlock {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  blockerId String
+  blocker   User   @relation("BlockerUser", fields: [blockerId], references: [id])
+  blockedId String
+  blocked   User   @relation("BlockedUser", fields: [blockedId], references: [id])
+
+  @@unique([blockerId, blockedId])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
