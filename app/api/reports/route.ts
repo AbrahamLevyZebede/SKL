@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   // Notify admin
   const admins = await prisma.user.findMany({ where: { role: "ADMIN" } });
   await prisma.notification.createMany({
-    data: admins.map((a) => ({
+    data: admins.map((a: any) => ({
       userId: a.id,
       type: "ADMIN_REPORT",
       title: "Nuevo reporte de usuario",

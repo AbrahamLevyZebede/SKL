@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
       where: { senderId: otherId, receiverId: userId, read: false },
       data: { read: true },
     });
-    return NextResponse.json(messages.map((m) => ({ ...m, images: JSON.parse(m.images) })));
+    return NextResponse.json(messages.map((m: any) => ({ ...m, images: JSON.parse(m.images) })));
   }
 
   // Get conversation list

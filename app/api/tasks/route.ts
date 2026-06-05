@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
   ]);
 
   return NextResponse.json({
-    tasks: tasks.map((t) => ({ ...t, photos: JSON.parse(t.photos ?? "[]") })),
+    tasks: tasks.map((t: any) => ({ ...t, photos: JSON.parse(t.photos ?? "[]") })),
     total,
     pages: Math.ceil(total / limit),
   });

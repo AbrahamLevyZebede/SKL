@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     take: 50,
   });
 
-  return NextResponse.json(notifications.map((n) => ({ ...n, data: JSON.parse(n.data) })));
+  return NextResponse.json(notifications.map((n: any) => ({ ...n, data: JSON.parse(n.data) })));
 }
 
 export async function PATCH(req: NextRequest) {
