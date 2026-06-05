@@ -61,5 +61,5 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(bids.map((b) => ({ ...b, task: { ...b.task, photos: JSON.parse(b.task.photos) } })));
+  return NextResponse.json(bids.map((b) => ({ ...b, task: { ...b.task, photos: JSON.parse(b.task.photos ?? "[]") } })));
 }

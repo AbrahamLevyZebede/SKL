@@ -47,6 +47,6 @@ export async function GET(req: NextRequest) {
       pendingReports: reportCount,
     },
     recentUsers,
-    recentTasks: recentTasks.map((t: any) => ({ ...t, photos: JSON.parse(t.photos) })),
+    recentTasks: recentTasks.map((t: any) => ({ ...t, photos: JSON.parse(t.photos ?? "[]") })),
   });
 }

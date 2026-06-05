@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
   ]);
 
   return NextResponse.json({
-    tasks: tasks.map((t) => ({ ...t, photos: JSON.parse(t.photos) })),
+    tasks: tasks.map((t) => ({ ...t, photos: JSON.parse(t.photos ?? "[]") })),
     total,
     pages: Math.ceil(total / limit),
   });
@@ -80,5 +80,5 @@ export async function POST(req: NextRequest) {
     include: { client: { select: { id: true, name: true, image: true } } },
   });
 
-  return NextResponse.json({ ...task, photos: JSON.parse(task.photos) }, { status: 201 });
+  return NextResponse.json({ ...task, photos: JSON.parse(task.photos ?? "[]") }, { status: 201 });
 }

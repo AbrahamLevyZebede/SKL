@@ -17,5 +17,5 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json({ tasks: tasks.map((t) => ({ ...t, photos: JSON.parse(t.photos) })) });
+  return NextResponse.json({ tasks: tasks.map((t) => ({ ...t, photos: JSON.parse(t.photos ?? "[]") })) });
 }

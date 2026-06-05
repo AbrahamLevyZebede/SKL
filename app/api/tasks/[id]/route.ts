@@ -26,7 +26,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   // Increment view count
   await prisma.task.update({ where: { id }, data: { viewCount: { increment: 1 } } });
 
-  return NextResponse.json({ ...task, photos: JSON.parse(task.photos) });
+  return NextResponse.json({ ...task, photos: JSON.parse(task.photos ?? "[]") });
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -54,7 +54,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.isDraft !== undefined) updateData.isDraft = body.isDraft;
 
   const updated = await prisma.task.update({ where: { id }, data: updateData });
-  return NextResponse.json({ ...updated, photos: JSON.parse(updated.photos) });
+  return NextResponse.json({ ...updated, photos: JSON.parse(updated.photos ?? "[]") });
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
